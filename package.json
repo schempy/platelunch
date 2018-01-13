@@ -1,0 +1,80 @@
+{
+  "name": "platelunch",
+  "version": "0.0.0-development",
+  "description": "Generate boilerplate code for unit tests",
+  "bin": {
+    "platelunch": "./bin/platelunch.js"
+  },
+  "author": "Brian Schemp",
+  "license": "MIT",
+  "main": "./index.js",
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "test",
+    "unit test",
+    "testing",
+    "ast",
+    "generator"
+  ],
+  "jest": {
+    "testMatch": [
+      "**/__tests__/unit/*.js"
+    ],
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "index.js"
+    ],
+    "coverageDirectory": "<rootDir>__tests__/coverage",
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
+  },
+  "dependencies": {
+    "@babel/template": "7.0.0-beta.35",
+    "babel-generator": "6.24.1",
+    "babel-traverse": "6.24.1",
+    "babel-types": "6.24.1",
+    "babylon": "6.17.1",
+    "globby": "7.1.1",
+    "lodash.difference": "4.5.0",
+    "minimist": "1.2.0",
+    "mkdirp": "0.5.1"
+  },
+  "devDependencies": {
+    "commitizen": "2.9.6",
+    "cz-conventional-changelog": "2.1.0",
+    "eslint": "4.10.0",
+    "eslint-config-prettier": "2.7.0",
+    "eslint-plugin-prettier": "2.3.1",
+    "jest": "22.0.4",
+    "prettier": "1.8.2",
+    "semantic-release": "11.0.2",
+    "travis-deploy-once": "4.3.1"
+  },
+  "scripts": {
+    "commit": "git-cz",
+    "test": "jest --verbose",
+    "pretest": "npm run lint",
+    "prettier": "prettier --write \"src/**/*.js\" \"bin/*.js\" \"index.js\"",
+    "lint": "npm run src-lint && npm run test-lint",
+    "src-lint": "eslint --fix src/*.js",
+    "test-lint": "prettier --write \"__tests__/unit/*.js\"",
+    "travis-deploy-once": "travis-deploy-once",
+    "semantic-release": "semantic-release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schempy/platelunch.git"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  }
+}

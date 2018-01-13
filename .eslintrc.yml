@@ -1,0 +1,23 @@
+env:
+  es6: true
+  node: true
+extends: 
+  - 'eslint:recommended'
+  - 'prettier'
+plugins:
+  - 'prettier'
+parserOptions:
+  sourceType: module
+rules:
+  indent:
+    - error
+    - tab
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - error
+    - double
+  semi:
+    - error
+    - always
