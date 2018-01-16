@@ -22,12 +22,12 @@
     "testMatch": [
       "**/__tests__/unit/*.js"
     ],
-    "collectCoverage": false,
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.js",
       "index.js"
     ],
-    "coverageDirectory": "<rootDir>__tests__/coverage",
+    "coverageDirectory": "./coverage/",
     "coverageReporters": [
       "json",
       "lcov",
@@ -47,6 +47,7 @@
     "mkdirp": "0.5.1"
   },
   "devDependencies": {
+    "codecov": "3.0.0",
     "commitizen": "2.9.6",
     "cz-conventional-changelog": "2.1.0",
     "eslint": "4.10.0",
