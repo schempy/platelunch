@@ -15,9 +15,7 @@ function generate(model, opts) {
 	});
 
 	const requireDeclarations = createRequireDeclarations({
-		requireDeclarations: model.getRequireDeclarations(),
-		libraries: model.getLibraries(),
-		testBuilder: testBuilder
+		requireDeclarations: model.getRequireDeclarations()
 	});
 
 	const mainFileInclude = createMainFileInclude({
@@ -124,13 +122,6 @@ function createMethodTest(opts) {
 	blockStatement.push(...variables);
 	blockStatement.push(methodCall);
 	blockStatement.push(...postTest);
-
-	// const ast = t.expressionStatement(
-	//   t.callExpression(t.identifier("test"), [
-	//     t.stringLiteral(method.name),
-	//     t.arrowFunctionExpression([], t.blockStatement(blockStatement))
-	//   ])
-	// );
 
 	const ast = testBuilder.createTestBlock({
 		description: method.name,
@@ -270,13 +261,6 @@ function createFunctionTest(opts) {
 		description: functionDetails.name,
 		blockStatement
 	});
-
-	// const ast = t.expressionStatement(
-	//   t.callExpression(t.identifier("test"), [
-	//     t.stringLiteral(functionDetails.name),
-	//     t.arrowFunctionExpression([], t.blockStatement(blockStatement))
-	//   ])
-	// );
 
 	return ast;
 }
@@ -423,8 +407,7 @@ function createTests(opts) {
 
 	const teardown = testBuilder.teardown({
 		libraries: model.getLibraries(),
-		imports: model.getImportDeclarations(),
-		requireDeclarations: model.getRequireDeclarations()
+		imports: model.getImportDeclarations()
 	});
 
 	blockStatement.push(...teardown);
@@ -442,9 +425,6 @@ function createTests(opts) {
 
 function createRequireDeclarations(opts) {
 	const requireDeclarations = opts.requireDeclarations;
-	const libraries = opts.libraries;
-	const testBuilder = opts.testBuilder;
-
 	const requireDeclarationsAst = requireDeclarations.reduce(
 		(acc, requiredModule) => {
 			const requireStatement = t.variableDeclaration("const", [
@@ -457,13 +437,6 @@ function createRequireDeclarations(opts) {
 			]);
 
 			acc.push(requireStatement);
-
-			const mockRequireList = testBuilder.createMockFromRequire({
-				libraries: libraries,
-				requiredModule: requiredModule
-			});
-
-			acc.push(...mockRequireList);
 
 			return acc;
 		},

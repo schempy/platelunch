@@ -23,14 +23,8 @@ describe("Mocks", () => {
       const expected = `
         const someLibrary = require("some-library");
         
-        jest.mock("some-library", () => ({
-          someLibrary: {}
-        }));
         import { doSomething } from "my-module.js";
         describe("my-module.js", () => {
-          afterEach(() => {
-            someLibrary.mockClear();
-          });
           test("doSomething", () => {
             jest.spyOn(someLibrary);
             doSomething();
@@ -63,16 +57,8 @@ describe("Mocks", () => {
       const expected = `
         const someLibrary = require("some-library");
         
-        jest.mock("some-library", () => ({
-          someLibrary: {
-            someFunction: {}
-          }
-        }));
         import { doSomething } from "my-module.js";
         describe("my-module.js", () => {
-          afterEach(() => {
-            someLibrary.someFunction.mockClear();
-          });
           test("doSomething", () => {
             jest.spyOn(someLibrary, "someFunction");
             doSomething();
@@ -179,14 +165,8 @@ describe("Mocks", () => {
       const expected = `
         const someModule = require("some-library");
         
-        jest.mock("some-library", () => ({
-          someModule: {}
-        }));
         import { someFunction } from "my-module.js";
         describe("my-module.js", () => {
-          afterEach(() => {
-            someModule.mockClear();
-          });
           test("someFunction", () => {
             jest.spyOn(someModule);
             someFunction();
@@ -297,17 +277,11 @@ describe("Mocks", () => {
       const expected = `
         const someModule = require("some-module");
         
-        jest.mock("some-module", () => ({
-          someModule: {}
-        }));
         import { Util } from "TestClass.js";
         describe("TestClass.js", () => {
           let util;
           beforeEach(() => {
             util = new Util();
-          });
-          afterEach(() => {
-            someModule.mockClear();
           });
           test("someFunction", () => {
             jest.spyOn(someModule);

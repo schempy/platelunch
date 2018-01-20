@@ -61,23 +61,19 @@ jestUtil.setup = function(opts) {
 jestUtil.teardown = function(opts) {
   const libraries = opts.libraries;
   const imports = opts.imports;
-  const requireDeclarations = opts.requireDeclarations;
 
-  if (libraries.length === 0) {
+  if (libraries.length === 0 || imports.length === 0) {
     return [];
   }
 
   const includedList = libraries.reduce((acc, library) => {
-    const requireDeclarationExist = requireDeclarations.some(
-      requireDeclaration => requireDeclaration.name === library.name
-    );
     const importExist = imports.some(importDetails => {
       const exists = importDetails.names.some(name => name === library.name);
 
       return exists;
     });
 
-    if (requireDeclarationExist || importExist) {
+    if (importExist) {
       acc.push(library);
     }
 
@@ -161,34 +157,6 @@ jestUtil.createMockFromImport = function(opts) {
   }
 
   return mockImportList;
-};
-
-jestUtil.createMockFromRequire = function(opts) {
-  const libraries = opts.libraries;
-  const requiredModule = opts.requiredModule;
-  let mockRequireList = [];
-
-  libraries.forEach(library => {
-    if (library.name === requiredModule.name) {
-      const callPaths = library.paths.reduce((acc, path) => {
-        acc.push(`${path}: {}`);
-
-        return acc;
-      }, []);
-
-      const ast = template.ast(`
-        jest.mock("${requiredModule.path}", () => ({
-          ${library.name}: {
-            ${callPaths.join(",")}
-          }
-        }));
-      `);
-
-      mockRequireList = [ast];
-    }
-  });
-
-  return mockRequireList;
 };
 
 jestUtil.preTest = function(opts) {
