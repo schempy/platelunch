@@ -139,7 +139,7 @@ describe("Mocks", () => {
         import { someLibrary } from "some-library";
         jest.mock("some-library", () => ({
           someLibrary: {
-            someMethod: {}
+            someMethod: jest.fn()
           }
         }));
         import { doSomething } from "my-module.js";
@@ -219,7 +219,7 @@ describe("Mocks", () => {
       const expected = `
         import { someModule } from "some-library";
         jest.mock("some-library", () => ({
-          someModule: {}
+          someModule: jest.fn()
         }));
         import { someFunction } from "my-module.js";
         describe("my-module.js", () => {
@@ -340,7 +340,7 @@ describe("Mocks", () => {
       const expected = `
         import { someModule } from "some-library";
         jest.mock("some-library", () => ({
-          someModule: {}
+          someModule: jest.fn()
         }));
         import { TestClass } from "TestClass.js";
         describe("TestClass.js", () => {
@@ -383,7 +383,7 @@ describe("Mocks", () => {
         import { someModule } from "some-library";
         jest.mock("some-library", () => ({
           someModule: {
-            someFunction: {}
+            someFunction: jest.fn()
           }
         }));
         import { TestClass } from "TestClass.js";
@@ -430,7 +430,7 @@ describe("Mocks", () => {
       const expected = `
         import { someModule } from "some-module";
         jest.mock("some-module", () => ({
-          someModule: {}
+          someModule: jest.fn()
         }));
         import { TestClass } from "TestClass.js";
         describe("TestClass.js", () => {
@@ -520,11 +520,11 @@ describe("Mocks", () => {
       const expected = `
         import { someModule } from "some-module";
         jest.mock("some-module", () => ({
-          someModule: {}
+          someModule: jest.fn()
         }));
         import { anotherModule } from "another-module";
         jest.mock("another-module", () => ({
-          anotherModule: {}
+          anotherModule: jest.fn()
         }));
         import { doSomething, doSomethingElse } from "my-module.js";
         describe("my-module.js", () => {
@@ -570,7 +570,7 @@ describe("Mocks", () => {
       const expected = `
         import { someModule } from "some-module";
         jest.mock("some-module", () => ({
-          someModule: {}
+          someModule: jest.fn()
         }));
         import { doSomething } from "my-module.js";
         describe("my-module.js", () => {
@@ -587,6 +587,7 @@ describe("Mocks", () => {
 
       expect(output).toBe(expected);
     });
+
     test("should mock two call expressions from the same import", () => {
       const code = `
         import { someModule } from "some-module";
@@ -610,8 +611,8 @@ describe("Mocks", () => {
         import { someModule } from "some-module";
         jest.mock("some-module", () => ({
           someModule: {
-            one: {},
-            two: {}
+            one: jest.fn(),
+            two: jest.fn()
           }
         }));
         import { doSomething } from "my-module.js";

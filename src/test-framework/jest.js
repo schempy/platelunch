@@ -132,15 +132,21 @@ jestUtil.createMockFromImport = function(opts) {
 
       libraryFilter.forEach(library => {
         const callPaths = library.paths.reduce((acc, path) => {
-          acc.push(`${path}: {}`);
+          acc.push(`${path}: jest.fn()`);
 
           return acc;
         }, []);
 
-        acc.push(`
-          ${libraryFilter[0].name}: {
-              ${callPaths.join(",")}
-          }`);
+        if (callPaths.length > 0) {
+          acc.push(`
+            ${libraryFilter[0].name}: {
+                ${callPaths.join(",")}
+            }`);
+        } else {
+          acc.push(`
+            ${libraryFilter[0].name}: jest.fn()
+          `);
+        }
       });
 
       return acc;
