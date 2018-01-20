@@ -26,7 +26,6 @@ describe("Mocks", () => {
         import { doSomething } from "my-module.js";
         describe("my-module.js", () => {
           test("doSomething", () => {
-            jest.spyOn(someLibrary);
             doSomething();
           });
         });`
@@ -168,7 +167,6 @@ describe("Mocks", () => {
         import { someFunction } from "my-module.js";
         describe("my-module.js", () => {
           test("someFunction", () => {
-            jest.spyOn(someModule);
             someFunction();
           });
         });`
@@ -207,7 +205,6 @@ describe("Mocks", () => {
             someModule.mockClear();
           });
           test("someFunction", () => {
-            jest.spyOn(someModule);
             someFunction();
           });
         });`
@@ -244,7 +241,6 @@ describe("Mocks", () => {
           someModule.mockClear();
         });
         test("doSomething", () => {
-          jest.spyOn(someModule);
           doSomething();
         });
       });`
@@ -284,7 +280,6 @@ describe("Mocks", () => {
             util = new Util();
           });
           test("someFunction", () => {
-            jest.spyOn(someModule);
             util.someFunction();
           });
         });`
@@ -326,7 +321,6 @@ describe("Mocks", () => {
             someModule.mockClear();
           });
           test("doSomething", () => {
-            jest.spyOn(someModule);
             testClass.doSomething();
           });
         });`
@@ -507,12 +501,9 @@ describe("Mocks", () => {
             anotherModule.mockClear();
           });
           test("doSomething", () => {
-            jest.spyOn(someModule);
-            jest.spyOn(anotherModule);
             doSomething();
           });
           test("doSomethingElse", () => {
-            jest.spyOn(someModule);
             doSomethingElse();
           });
         });`
@@ -552,7 +543,6 @@ describe("Mocks", () => {
             someModule.mockClear();
           });
           test("doSomething", () => {
-            jest.spyOn(someModule);
             doSomething();
           });
         }); `

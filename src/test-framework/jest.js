@@ -176,7 +176,16 @@ jestUtil.preTest = function(opts) {
       return exists;
     });
 
-    if (requireDeclarationExist || importExist) {
+    const thisExpFilter = callExpression.filter(callExp => callExp === this);
+    let callCanBeSpied = true;
+    
+    // Method/function can be spied if there is a object and method
+    // Example: someLibrary.someMethod()
+    if (thisExpFilter.length === 0 && callExpression.length === 1) {
+      callCanBeSpied = false;
+    }
+
+    if ((importExist || requireDeclarationExist) && callCanBeSpied) {
       acc.push(createSpy(callExpression));
     }
 
