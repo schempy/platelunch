@@ -7,6 +7,10 @@ describe("Function Declaration", () => {
         return num1 + num2;
       }
 
+      function subtrack() {
+        return true;
+      }
+
       module.exports = add;
     `;
 
@@ -18,7 +22,8 @@ describe("Function Declaration", () => {
     });
 
     const expected = `
-      import { add } from "my-module.js";
+      const add = require("my-module");
+
       describe("my-module.js", () => {
         test("add", () => {
           const num1 = null;
@@ -47,7 +52,8 @@ describe("Function Declaration", () => {
     });
 
     const expected = `
-      import { something } from "my-module.js";
+      const something = require("my-module");
+
       describe("my-module.js", () => {
         test("something", () => {
           something();
@@ -78,7 +84,8 @@ describe("Function Expression", () => {
     });
 
     const expected = `
-      import { add } from "my-module.js";
+      const add = require("my-module");
+
       describe("my-module.js", () => {
         test("add", () => {
           const num1 = null;
@@ -107,7 +114,8 @@ describe("Function Expression", () => {
     });
 
     const expected = `
-      import { something } from "my-module.js";
+      const something = require("my-module");
+
       describe("my-module.js", () => {
         test("something", () => {
           something();
@@ -138,7 +146,8 @@ describe("Function Expression", () => {
     });
 
     const expected = `
-      import { util } from "my-module.js";
+      const util = require("my-module");
+
       describe("my-module.js", () => {
         test("add", () => {
           const num1 = null;

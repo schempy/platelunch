@@ -23,7 +23,7 @@ describe("Classes", () => {
       });
 
       const expected = `
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -59,7 +59,7 @@ describe("Classes", () => {
       });
 
       const expected = `
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -98,7 +98,7 @@ describe("Classes", () => {
       });
 
       const expected = `
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -138,7 +138,7 @@ describe("Classes", () => {
       });
 
       const expected = `
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {

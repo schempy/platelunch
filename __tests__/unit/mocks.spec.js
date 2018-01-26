@@ -23,7 +23,8 @@ describe("Mocks", () => {
       const expected = `
         const someLibrary = require("some-library");
         
-        import { doSomething } from "my-module.js";
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           test("doSomething", () => {
             doSomething();
@@ -56,7 +57,8 @@ describe("Mocks", () => {
       const expected = `
         const someLibrary = require("some-library");
         
-        import { doSomething } from "my-module.js";
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           test("doSomething", () => {
             jest.spyOn(someLibrary, "someFunction");
@@ -90,7 +92,8 @@ describe("Mocks", () => {
       const expected = `
         const someLibrary = require("some-library");
         
-        import { doSomething } from "my-module.js";
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           test("doSomething", () => {
             const result = doSomething();
@@ -127,7 +130,9 @@ describe("Mocks", () => {
             someMethod: jest.fn()
           }
         }));
-        import { doSomething } from "my-module.js";
+
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           afterEach(() => {
             someLibrary.someMethod.mockClear();
@@ -164,7 +169,8 @@ describe("Mocks", () => {
       const expected = `
         const someModule = require("some-library");
         
-        import { someFunction } from "my-module.js";
+        const someFunction = require("my-module");
+
         describe("my-module.js", () => {
           test("someFunction", () => {
             someFunction();
@@ -199,7 +205,9 @@ describe("Mocks", () => {
         jest.mock("some-library", () => ({
           someModule: jest.fn()
         }));
-        import { someFunction } from "my-module.js";
+
+        const someFunction = require("my-module");
+
         describe("my-module.js", () => {
           afterEach(() => {
             someModule.mockClear();
@@ -235,7 +243,9 @@ describe("Mocks", () => {
       const expected = `
       import someModule from "some-module";
       jest.mock("some-module", () => ({}));
-      import { doSomething } from "my-module.js";
+
+      const doSomething = require("my-module");
+
       describe("my-module.js", () => {
         afterEach(() => {
           someModule.mockClear();
@@ -266,15 +276,16 @@ describe("Mocks", () => {
       const output = generateCode({
         code: code,
         testFramework: "jest",
-        filename: "TestClass.js",
+        filename: "my-module.js",
         removeWhitespace: true
       });
 
       const expected = `
         const someModule = require("some-module");
         
-        import { Util } from "TestClass.js";
-        describe("TestClass.js", () => {
+        const Util = require("my-module");
+
+        describe("my-module.js", () => {
           let util;
           beforeEach(() => {
             util = new Util();
@@ -311,7 +322,7 @@ describe("Mocks", () => {
         jest.mock("some-library", () => ({
           someModule: jest.fn()
         }));
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -354,7 +365,7 @@ describe("Mocks", () => {
             someFunction: jest.fn()
           }
         }));
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -400,7 +411,7 @@ describe("Mocks", () => {
         jest.mock("some-module", () => ({
           someModule: jest.fn()
         }));
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -439,7 +450,7 @@ describe("Mocks", () => {
       });
 
       const expected = `
-        import { TestClass } from "TestClass.js";
+        import { TestClass } from "TestClass";
         describe("TestClass.js", () => {
           let testClass;
           beforeEach(() => {
@@ -494,7 +505,11 @@ describe("Mocks", () => {
         jest.mock("another-module", () => ({
           anotherModule: jest.fn()
         }));
-        import { doSomething, doSomethingElse } from "my-module.js";
+
+        const doSomething = require("my-module").doSomething;
+
+        const doSomethingElse = require("my-module").doSomethingElse;
+
         describe("my-module.js", () => {
           afterEach(() => {
             someModule.mockClear();
@@ -537,7 +552,9 @@ describe("Mocks", () => {
         jest.mock("some-module", () => ({
           someModule: jest.fn()
         }));
-        import { doSomething } from "my-module.js";
+
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           afterEach(() => {
             someModule.mockClear();
@@ -579,7 +596,9 @@ describe("Mocks", () => {
             two: jest.fn()
           }
         }));
-        import { doSomething } from "my-module.js";
+
+        const doSomething = require("my-module");
+
         describe("my-module.js", () => {
           afterEach(() => {
             someModule.one.mockClear();

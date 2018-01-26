@@ -15,7 +15,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import { TestClass } from "TestClass.js";
+      import { TestClass } from "TestClass";
       describe("TestClass.js", () => {
         let testClass;
         beforeEach(() => {
@@ -48,7 +48,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import { TestClass } from "TestClass.js";
+      import { TestClass } from "TestClass";
       describe("TestClass.js", () => {
         let testClass;
         beforeEach(() => {
@@ -85,7 +85,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import { Class1, Class2 } from "TestClass.js";
+      import { Class1, Class2 } from "TestClass";
       describe("TestClass.js", () => {
         let class1;
         let class2;
@@ -121,7 +121,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import TestClass from "TestClass.js";
+      import TestClass from "TestClass";
       describe("TestClass.js", () => {
         let testClass;
         beforeEach(() => {
@@ -152,7 +152,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import { someFunction } from "my-module.js";
+      import { someFunction } from "my-module";
       describe("my-module.js", () => {
         test("someFunction", () => {
           someFunction();
@@ -177,7 +177,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import someFunction from "my-module.js";
+      import someFunction from "my-module";
       describe("my-module.js", () => {
         test("someFunction", () => {
           someFunction();
@@ -204,7 +204,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-    import { someFunction } from "my-module.js";
+    import { someFunction } from "my-module";
     describe("my-module.js", () => {
       test("someFunction", () => {
         someFunction();
@@ -235,7 +235,7 @@ describe("Exports", () => {
     });
 
     const expected = `
-      import { Util } from "my-module.js";
+      import { Util } from "my-module";
       describe("my-module.js", () => {
         let util;
         beforeEach(() => {

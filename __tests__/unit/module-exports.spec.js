@@ -18,7 +18,8 @@ describe("Module exports", () => {
         removeWhitespace: true
       });
       const expected = `
-        import { something } from "my-module.js";
+        const something = require("my-module").something;
+
         describe("my-module.js", () => {
           test("something", () => {
             something();
@@ -44,7 +45,8 @@ describe("Module exports", () => {
         removeWhitespace: true
       });
       const expected = `
-        import { something } from "my-module.js";
+        const something = require("my-module");
+
         describe("my-module.js", () => {
           test("something", () => {
             something();
@@ -76,7 +78,8 @@ describe("Module exports", () => {
         removeWhitespace: true
       });
       const expected = `
-        import { add } from "my-module.js";
+        const add = require("my-module");
+
         describe("my-module.js", () => {
           test("add", () => {
             const num1 = null;
@@ -110,7 +113,8 @@ describe("Module exports", () => {
         removeWhitespace: true
       });
       const expected = `
-        import { add } from "my-module.js";
+        const add = require("my-module");
+
         describe("my-module.js", () => {
           test("add", () => {
             const num1 = null;
@@ -143,7 +147,8 @@ describe("Module exports", () => {
       });
 
       const expected = `
-        import { Util } from "my-module.js";
+        const Util = require("my-module");
+
         describe("my-module.js", () => {
           let util;
           beforeEach(() => {
@@ -153,6 +158,37 @@ describe("Module exports", () => {
             const num1 = null;
             const num2 = null;
             const result = util.add(num1, num2);
+          });
+        });`
+        .replace(/ /g, "")
+        .trim();
+
+      expect(output).toBe(expected);
+    });
+
+    test("should export function when filename does not have a '.js' file extension", () => {
+      const code = `
+        var add = function(num1, num2) {
+          return num1 + num2;
+        }
+  
+        module.exports = add;
+      `;
+
+      const output = generateCode({
+        code: code,
+        testFramework: "jest",
+        filename: "my-module",
+        removeWhitespace: true
+      });
+      const expected = `
+        const add = require("my-module");
+
+        describe("my-module", () => {
+          test("add", () => {
+            const num1 = null;
+            const num2 = null;
+            const result = add(num1, num2);
           });
         });`
         .replace(/ /g, "")

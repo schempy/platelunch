@@ -25,7 +25,7 @@ function generate(model, opts) {
 	});
 
 	const tests = createTests({ model, testBuilder });
-	const body = [...imports, ...requireDeclarations, mainFileInclude, tests];
+	const body = [...imports, ...requireDeclarations, ...mainFileInclude, tests];
 	const testAst = t.program(body, []);
 	const output = babelGenerate(testAst, {
 		quotes: "double"
@@ -35,51 +35,59 @@ function generate(model, opts) {
 }
 
 function createMainFileInclude(opts) {
-	const filename = opts.filename;
+	const regEx = RegExp(/\w+\.js/g);
+	const fileExtMatch = regEx.test(opts.filename);
+	const filename = fileExtMatch 
+		? opts.filename.split(".")[0]
+		: opts.filename;
+
 	const exportDeclarations = opts.exportDeclarations;
 	const moduleExports = opts.moduleExports;
-	let specifiers = [];
+	let sourceFiles = [];
 
-	exportDeclarations.reduce((acc, exportDeclaration) => {
-		let specifier = null;
-
-		if (exportDeclaration.type === "named") {
-			specifier = t.importSpecifier(
-				t.identifier(exportDeclaration.name),
-				t.identifier(exportDeclaration.name)
-			);
-		} else {
-			specifier = t.importDefaultSpecifier(
-				t.identifier(exportDeclaration.name)
-			);
-		}
-
-		acc.push(specifier);
-
-		return acc;
-	}, specifiers);
-
-	if (specifiers.length === 0) {
-		moduleExports.reduce((acc, moduleExport) => {
+	if (exportDeclarations.length > 0) {
+		const specifiers = exportDeclarations.reduce((acc, exportDeclaration) => {
 			let specifier = null;
-
-			specifier = t.importSpecifier(
-				t.identifier(moduleExport.value),
-				t.identifier(moduleExport.value)
-			);
-
+  
+			if (exportDeclaration.type === "named") {
+				specifier = t.importSpecifier(
+					t.identifier(exportDeclaration.name),
+					t.identifier(exportDeclaration.name)
+				);
+			} else {
+				specifier = t.importDefaultSpecifier(
+					t.identifier(exportDeclaration.name)
+				);
+			}
+  
 			acc.push(specifier);
-
+  
 			return acc;
-		}, specifiers);
+		}, []);
+
+		sourceFiles = [t.importDeclaration(
+			specifiers,
+			t.stringLiteral(filename)
+		)];
+    
+	} else {
+		sourceFiles = moduleExports.reduce((acc, moduleExport) => {
+			if (moduleExport.type === "identifier") {
+				acc.push(
+					template.ast(`const ${moduleExport.value} = require("${filename}");`)
+				);
+			} else {
+				acc.push(
+					template.ast(`const ${moduleExport.value} = require("${filename}").${moduleExport.value};`)
+				);
+			}
+      
+			return acc;
+		}, []);
+
 	}
 
-	const mainInclude = t.importDeclaration(
-		specifiers,
-		t.stringLiteral(filename)
-	);
-
-	return mainInclude;
+	return sourceFiles;
 }
 
 function createMethodTest(opts) {

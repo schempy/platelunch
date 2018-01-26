@@ -405,13 +405,15 @@ function getModuleExports(node) {
 	if (t.isIdentifier(node.right)) {
 		moduleExports.push({
 			name: node.right.name,
-			value: node.right.name
+			value: node.right.name,
+			type: "identifier"
 		});
 	} else if (t.isObjectExpression(node.right)) {
 		moduleExports = node.right.properties.reduce((acc, property) => {
 			acc.push({
 				name: property.key.name,
-				value: property.value.name
+				value: property.value.name,
+				type: "object"
 			});
 
 			return acc;
