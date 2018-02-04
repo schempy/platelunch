@@ -41,7 +41,7 @@ function generate(ast, filename) {
 
 		CallExpression(path) {
 			if (t.isIdentifier(path.node.callee, { name: "require" })) {
-				requireDeclarations.push(path.parent);
+				requireDeclarations.push(path.parentPath);
 			}
 		},
 
@@ -85,11 +85,21 @@ function generate(ast, filename) {
 		});
 	});
 
-	requireDeclarations.forEach(ast => {
-		testModel.addRequireDeclaration({
-			name: ast.id.name,
-			path: ast.init.arguments[0].value
-		});
+	requireDeclarations.forEach(parentPath => {
+		let name = "";
+		let path = "";
+		let scope = "";
+
+		if (t.isMemberExpression(parentPath.node)) {
+			name = parentPath.parent.id.name;
+			path = parentPath.node.object.arguments[0].value;
+			scope = parentPath.node.property.name;
+		} else {
+			name = parentPath.node.id.name;
+			path = parentPath.node.init.arguments[0].value;
+		}
+
+		testModel.addRequireDeclaration({ name, path, scope });
 	});
 
 	if (classBodies.length > 0) {

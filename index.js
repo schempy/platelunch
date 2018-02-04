@@ -9,7 +9,9 @@ const mkdirp = require("mkdirp");
 const globby = require("globby");
 
 function getOptions(opts) {
-  const defaultTestFramework = opts["test-framework"] ? opts["test-framework"] : "jest";
+  const defaultTestFramework = opts["test-framework"]
+    ? opts["test-framework"]
+    : "jest";
 
   return {
     testFramework: defaultTestFramework
@@ -25,15 +27,14 @@ function eachFilename(patterns, callback) {
       .map(filePath => path.relative(process.cwd(), filePath));
 
     if (filePaths.length === 0) {
-      console.error(`No matching files. Tried: ${patterns.join(" ")}`)
+      console.error(`No matching files. Tried: ${patterns.join(" ")}`);
       process.exitCode = 2;
       return;
     }
 
-    filePaths.forEach((filePath) => {
+    filePaths.forEach(filePath => {
       callback(filePath);
-    })
-
+    });
   } catch (err) {
     console.error(`Unable to expand glob patterns: ${patterns.join(" ")}`);
     process.exitCode = 2;
@@ -84,15 +85,14 @@ function parseOptions(opts) {
     ];
 
     process.stdout.write(usage.join("\n"));
-  }
-  else {
+  } else {
     generate(opts);
   }
 }
 
 function generate(opts) {
   const filepatterns = opts["_"];
-  
+
   eachFilename(filepatterns, filename => {
     const options = getOptions(opts);
 
@@ -101,14 +101,16 @@ function generate(opts) {
     try {
       const input = fs.readFileSync(filename, "utf8");
       const testfile = generateTestFileName(filename);
-      createTestDirectory(testfile);      
+      createTestDirectory(testfile);
       const ast = parser.parse(input);
       const astModel = modelUtil.generate(ast, filename);
       const output = testUtil.generate(astModel, options);
 
       fs.writeFileSync(testfile, output, "utf8");
     } catch (err) {
-      console.error("Unable to write test file: " + filename + "\n" + err + "\n");
+      console.error(
+        "Unable to write test file: " + filename + "\n" + err + "\n"
+      );
       process.exitCode = 2;
 
       return;

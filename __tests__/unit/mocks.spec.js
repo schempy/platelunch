@@ -615,5 +615,39 @@ describe("Mocks", () => {
 
       expect(output).toBe(expected);
     });
+
+    test("should not mock a scope on a required module", () => {
+      const code = `
+        const someFunction = require("util").someFunction;
+
+        function doSomething() {
+          someFunction();
+        }
+
+        module.exports = doSomething;
+      `;
+
+      const output = generateCode({
+        code: code,
+        testFramework: "jest",
+        filename: "my-module.js",
+        removeWhitespace: true
+      });
+
+      const expected = `
+        const someFunction = require("util").someFunction;
+
+        const doSomething = require("my-module");
+        
+        describe("my-module.js", () => {
+          test("doSomething", () => {
+            doSomething();
+          });
+        });`
+        .replace(/ /g, "")
+        .trim();
+
+      expect(output).toBe(expected);
+    });
   });
 });

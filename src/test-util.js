@@ -37,9 +37,7 @@ function generate(model, opts) {
 function createMainFileInclude(opts) {
 	const regEx = RegExp(/\w+\.js/g);
 	const fileExtMatch = regEx.test(opts.filename);
-	const filename = fileExtMatch 
-		? opts.filename.split(".")[0]
-		: opts.filename;
+	const filename = fileExtMatch ? opts.filename.split(".")[0] : opts.filename;
 
 	const exportDeclarations = opts.exportDeclarations;
 	const moduleExports = opts.moduleExports;
@@ -48,7 +46,7 @@ function createMainFileInclude(opts) {
 	if (exportDeclarations.length > 0) {
 		const specifiers = exportDeclarations.reduce((acc, exportDeclaration) => {
 			let specifier = null;
-  
+
 			if (exportDeclaration.type === "named") {
 				specifier = t.importSpecifier(
 					t.identifier(exportDeclaration.name),
@@ -59,17 +57,13 @@ function createMainFileInclude(opts) {
 					t.identifier(exportDeclaration.name)
 				);
 			}
-  
+
 			acc.push(specifier);
-  
+
 			return acc;
 		}, []);
 
-		sourceFiles = [t.importDeclaration(
-			specifiers,
-			t.stringLiteral(filename)
-		)];
-    
+		sourceFiles = [t.importDeclaration(specifiers, t.stringLiteral(filename))];
 	} else {
 		sourceFiles = moduleExports.reduce((acc, moduleExport) => {
 			if (moduleExport.type === "identifier") {
@@ -78,13 +72,16 @@ function createMainFileInclude(opts) {
 				);
 			} else {
 				acc.push(
-					template.ast(`const ${moduleExport.value} = require("${filename}").${moduleExport.value};`)
+					template.ast(
+						`const ${moduleExport.value} = require("${filename}").${
+							moduleExport.value
+						};`
+					)
 				);
 			}
-      
+
 			return acc;
 		}, []);
-
 	}
 
 	return sourceFiles;
@@ -435,16 +432,21 @@ function createRequireDeclarations(opts) {
 	const requireDeclarations = opts.requireDeclarations;
 	const requireDeclarationsAst = requireDeclarations.reduce(
 		(acc, requiredModule) => {
-			const requireStatement = t.variableDeclaration("const", [
-				t.variableDeclarator(
-					t.identifier(requiredModule.name),
-					t.callExpression(t.identifier("require"), [
-						t.stringLiteral(requiredModule.path)
-					])
-				)
-			]);
-
-			acc.push(requireStatement);
+			if (requiredModule.scope) {
+				acc.push(
+					template.ast(
+						`const ${requiredModule.name} = require("${requiredModule.path}").${
+							requiredModule.scope
+						};`
+					)
+				);
+			} else {
+				acc.push(
+					template.ast(
+						`const ${requiredModule.name} = require("${requiredModule.path}");`
+					)
+				);
+			}
 
 			return acc;
 		},

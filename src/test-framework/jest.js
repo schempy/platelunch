@@ -178,7 +178,7 @@ jestUtil.preTest = function(opts) {
 
     const thisExpFilter = callExpression.filter(callExp => callExp === this);
     let callCanBeSpied = true;
-    
+
     // Method/function can be spied if there is a object and method
     // Example: someLibrary.someMethod()
     if (thisExpFilter.length === 0 && callExpression.length === 1) {
