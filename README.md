@@ -18,12 +18,16 @@
   </a>  
 </p>
 
+<p align="center">
+	<img src="./.assets/logo.png" height="275" width="415" alt="Platelunch logo"/>
+</p>
+
 ## Intro
 Platelunch generates boilerplate unit test code for javascript source files. Currently it will generate unit test files to be
 used with jest only. More testing frameworks will be supported.
 
 ## Install
-```
+```js
 npm install --save-dev platelunch
 
 --- or globally
@@ -69,7 +73,7 @@ module.exports = {
 
 #### Generated unit test file
 ```js
-import { add } from "src/my-module.js"
+const add = require("src/my-module.js").add;
 
 describe("my-module.js", () => {
   test("add", () => {
