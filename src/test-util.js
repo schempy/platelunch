@@ -7,455 +7,455 @@ const testFramework = require("./test-framework");
 const path = require("path");
 
 function generate(model, opts) {
-	const testBuilder = testFramework.getBuilder(opts);
-	const imports = createImport({
-		importDeclarations: model.getImportDeclarations(),
-		libraries: model.getLibraries(),
-		testBuilder: testBuilder
-	});
+  const testBuilder = testFramework.getBuilder(opts);
+  const imports = createImport({
+    importDeclarations: model.getImportDeclarations(),
+    libraries: model.getLibraries(),
+    testBuilder: testBuilder
+  });
 
-	const requireDeclarations = createRequireDeclarations({
-		requireDeclarations: model.getRequireDeclarations()
-	});
+  const requireDeclarations = createRequireDeclarations({
+    requireDeclarations: model.getRequireDeclarations()
+  });
 
-	const mainFileInclude = createMainFileInclude({
-		filename: model.getFilename(),
-		exportDeclarations: model.getExportDeclarations(),
-		moduleExports: model.getModuleExports()
-	});
+  const mainFileInclude = createMainFileInclude({
+    filename: model.getFilename(),
+    exportDeclarations: model.getExportDeclarations(),
+    moduleExports: model.getModuleExports()
+  });
 
-	const tests = createTests({ model, testBuilder });
-	const body = [...imports, ...requireDeclarations, ...mainFileInclude, tests];
-	const testAst = t.program(body, []);
-	const output = babelGenerate(testAst, {
-		quotes: "double"
-	});
+  const tests = createTests({ model, testBuilder });
+  const body = [...imports, ...requireDeclarations, ...mainFileInclude, tests];
+  const testAst = t.program(body, []);
+  const output = babelGenerate(testAst, {
+    quotes: "double"
+  });
 
-	return output.code;
+  return output.code;
 }
 
 function createMainFileInclude(opts) {
-	const regEx = RegExp(/\w+\.js/g);
-	const fileExtMatch = regEx.test(opts.filename);
-	const filename = fileExtMatch ? opts.filename.split(".")[0] : opts.filename;
+  const regEx = RegExp(/\w+\.js/g);
+  const fileExtMatch = regEx.test(opts.filename);
+  const filename = fileExtMatch ? opts.filename.split(".")[0] : opts.filename;
 
-	const exportDeclarations = opts.exportDeclarations;
-	const moduleExports = opts.moduleExports;
-	let sourceFiles = [];
+  const exportDeclarations = opts.exportDeclarations;
+  const moduleExports = opts.moduleExports;
+  let sourceFiles = [];
 
-	if (exportDeclarations.length > 0) {
-		const specifiers = exportDeclarations.reduce((acc, exportDeclaration) => {
-			let specifier = null;
+  if (exportDeclarations.length > 0) {
+    const specifiers = exportDeclarations.reduce((acc, exportDeclaration) => {
+      let specifier = null;
 
-			if (exportDeclaration.type === "named") {
-				specifier = t.importSpecifier(
-					t.identifier(exportDeclaration.name),
-					t.identifier(exportDeclaration.name)
-				);
-			} else {
-				specifier = t.importDefaultSpecifier(
-					t.identifier(exportDeclaration.name)
-				);
-			}
+      if (exportDeclaration.type === "named") {
+        specifier = t.importSpecifier(
+          t.identifier(exportDeclaration.name),
+          t.identifier(exportDeclaration.name)
+        );
+      } else {
+        specifier = t.importDefaultSpecifier(
+          t.identifier(exportDeclaration.name)
+        );
+      }
 
-			acc.push(specifier);
+      acc.push(specifier);
 
-			return acc;
-		}, []);
+      return acc;
+    }, []);
 
-		sourceFiles = [t.importDeclaration(specifiers, t.stringLiteral(filename))];
-	} else {
-		sourceFiles = moduleExports.reduce((acc, moduleExport) => {
-			if (moduleExport.type === "identifier") {
-				acc.push(
-					template.ast(`const ${moduleExport.value} = require("${filename}");`)
-				);
-			} else {
-				acc.push(
-					template.ast(
-						`const ${moduleExport.value} = require("${filename}").${
-							moduleExport.value
-						};`
-					)
-				);
-			}
+    sourceFiles = [t.importDeclaration(specifiers, t.stringLiteral(filename))];
+  } else {
+    sourceFiles = moduleExports.reduce((acc, moduleExport) => {
+      if (moduleExport.type === "identifier") {
+        acc.push(
+          template.ast(`const ${moduleExport.value} = require("${filename}");`)
+        );
+      } else {
+        acc.push(
+          template.ast(
+            `const ${moduleExport.value} = require("${filename}").${
+              moduleExport.value
+            };`
+          )
+        );
+      }
 
-			return acc;
-		}, []);
-	}
+      return acc;
+    }, []);
+  }
 
-	return sourceFiles;
+  return sourceFiles;
 }
 
 function createMethodTest(opts) {
-	const method = opts.method;
-	const className = opts.className;
-	const requireDeclarations = opts.requireDeclarations;
-	const imports = opts.imports;
-	const testBuilder = opts.testBuilder;
-	const variables = method.params.reduce((acc, param) => {
-		const variable = t.variableDeclaration("const", [
-			t.variableDeclarator(t.identifier(param), t.nullLiteral())
-		]);
+  const method = opts.method;
+  const className = opts.className;
+  const requireDeclarations = opts.requireDeclarations;
+  const imports = opts.imports;
+  const testBuilder = opts.testBuilder;
+  const variables = method.params.reduce((acc, param) => {
+    const variable = t.variableDeclaration("const", [
+      t.variableDeclarator(t.identifier(param), t.nullLiteral())
+    ]);
 
-		acc.push(variable);
+    acc.push(variable);
 
-		return acc;
-	}, []);
+    return acc;
+  }, []);
 
-	const methodCall = method.returns
-		? template.ast(`
+  const methodCall = method.returns
+    ? template.ast(`
           const result = ${className}.${method.name}(${method.params.join(
-	","
-)});
+        ","
+      )});
         `)
-		: template.ast(`
+    : template.ast(`
           ${className}.${method.name}(${method.params.join(",")});
         `);
 
-	let blockStatement = [];
+  let blockStatement = [];
 
-	const preTest = testBuilder.preTest({
-		callExpressions: method.callExpressions,
-		requireDeclarations,
-		imports
-	});
+  const preTest = testBuilder.preTest({
+    callExpressions: method.callExpressions,
+    requireDeclarations,
+    imports
+  });
 
-	const postTest = testBuilder.postTest({});
+  const postTest = testBuilder.postTest({});
 
-	blockStatement.push(...preTest);
-	blockStatement.push(...variables);
-	blockStatement.push(methodCall);
-	blockStatement.push(...postTest);
+  blockStatement.push(...preTest);
+  blockStatement.push(...variables);
+  blockStatement.push(methodCall);
+  blockStatement.push(...postTest);
 
-	const ast = testBuilder.createTestBlock({
-		description: method.name,
-		blockStatement
-	});
+  const ast = testBuilder.createTestBlock({
+    description: method.name,
+    blockStatement
+  });
 
-	return ast;
+  return ast;
 }
 
 function createImport(opts) {
-	const testBuilder = opts.testBuilder;
-	const declarations = opts.importDeclarations;
-	const libraries = opts.libraries;
+  const testBuilder = opts.testBuilder;
+  const declarations = opts.importDeclarations;
+  const libraries = opts.libraries;
 
-	const testModuleImports = testBuilder.createTestModuleImports();
+  const testModuleImports = testBuilder.createTestModuleImports();
 
-	const imports = declarations.reduce((acc, declaration) => {
-		if (declaration.type === "default") {
-			acc.push(
-				t.importDeclaration(
-					[t.importDefaultSpecifier(t.identifier(declaration.names[0]))],
-					t.stringLiteral(declaration.path)
-				)
-			);
-		} else {
-			const specifiers = declaration.names.reduce((list, name) => {
-				list.push(t.importSpecifier(t.identifier(name), t.identifier(name)));
+  const imports = declarations.reduce((acc, declaration) => {
+    if (declaration.type === "default") {
+      acc.push(
+        t.importDeclaration(
+          [t.importDefaultSpecifier(t.identifier(declaration.names[0]))],
+          t.stringLiteral(declaration.path)
+        )
+      );
+    } else {
+      const specifiers = declaration.names.reduce((list, name) => {
+        list.push(t.importSpecifier(t.identifier(name), t.identifier(name)));
 
-				return list;
-			}, []);
+        return list;
+      }, []);
 
-			acc.push(
-				t.importDeclaration(specifiers, t.stringLiteral(declaration.path))
-			);
-		}
+      acc.push(
+        t.importDeclaration(specifiers, t.stringLiteral(declaration.path))
+      );
+    }
 
-		const mockImportList = testBuilder.createMockFromImport({
-			path: declaration.path,
-			libraries: libraries,
-			declarations: declaration.names,
-			type: declaration.type
-		});
+    const mockImportList = testBuilder.createMockFromImport({
+      path: declaration.path,
+      libraries: libraries,
+      declarations: declaration.names,
+      type: declaration.type
+    });
 
-		acc.push(...mockImportList);
+    acc.push(...mockImportList);
 
-		return acc;
-	}, []);
+    return acc;
+  }, []);
 
-	return [...testModuleImports, ...imports];
+  return [...testModuleImports, ...imports];
 }
 
 function createFunctionTest(opts) {
-	const functionDetails = opts.functionDetails;
-	const exportName = opts.exportName;
-	const imports = opts.imports;
-	const requireDeclarations = opts.requireDeclarations;
-	const testBuilder = opts.testBuilder;
-	const variables = functionDetails.params.reduce((acc, param) => {
-		const variable = t.variableDeclaration("const", [
-			t.variableDeclarator(t.identifier(param), t.nullLiteral())
-		]);
+  const functionDetails = opts.functionDetails;
+  const exportName = opts.exportName;
+  const imports = opts.imports;
+  const requireDeclarations = opts.requireDeclarations;
+  const testBuilder = opts.testBuilder;
+  const variables = functionDetails.params.reduce((acc, param) => {
+    const variable = t.variableDeclaration("const", [
+      t.variableDeclarator(t.identifier(param), t.nullLiteral())
+    ]);
 
-		acc.push(variable);
+    acc.push(variable);
 
-		return acc;
-	}, []);
-	let callExpression = null;
-	let blockStatement = [];
-	let modifiedCalleeList = [];
+    return acc;
+  }, []);
+  let callExpression = null;
+  let blockStatement = [];
+  let modifiedCalleeList = [];
 
-	// TODO add comments
-	const isPrototypeFunction = functionDetails.callee.some(callee => {
-		return callee === "prototype";
-	});
+  // TODO add comments
+  const isPrototypeFunction = functionDetails.callee.some(callee => {
+    return callee === "prototype";
+  });
 
-	if (isPrototypeFunction) {
-		let prototypeIndex = 0;
+  if (isPrototypeFunction) {
+    let prototypeIndex = 0;
 
-		for (let i = 0; i < functionDetails.callee.length; i++) {
-			if (functionDetails.callee[i] === "prototype") {
-				prototypeIndex = i;
+    for (let i = 0; i < functionDetails.callee.length; i++) {
+      if (functionDetails.callee[i] === "prototype") {
+        prototypeIndex = i;
 
-				break;
-			}
-		}
+        break;
+      }
+    }
 
-		modifiedCalleeList = [
-			...functionDetails.callee.slice(0, prototypeIndex - 1),
-			...functionDetails.callee.slice(prototypeIndex)
-		];
+    modifiedCalleeList = [
+      ...functionDetails.callee.slice(0, prototypeIndex - 1),
+      ...functionDetails.callee.slice(prototypeIndex)
+    ];
 
-		modifiedCalleeList = modifiedCalleeList.reduce((acc, value) => {
-			if (value !== "prototype") {
-				acc.push(value);
-			}
+    modifiedCalleeList = modifiedCalleeList.reduce((acc, value) => {
+      if (value !== "prototype") {
+        acc.push(value);
+      }
 
-			return acc;
-		}, []);
+      return acc;
+    }, []);
 
-		modifiedCalleeList = [
-			exportName.charAt(0).toLowerCase() + exportName.slice(1),
-			...modifiedCalleeList
-		];
-	} else {
-		modifiedCalleeList = [...functionDetails.callee];
-	}
+    modifiedCalleeList = [
+      exportName.charAt(0).toLowerCase() + exportName.slice(1),
+      ...modifiedCalleeList
+    ];
+  } else {
+    modifiedCalleeList = [...functionDetails.callee];
+  }
 
-	if (modifiedCalleeList.length > 0) {
-		callExpression = `
+  if (modifiedCalleeList.length > 0) {
+    callExpression = `
       ${modifiedCalleeList.join(".")}
       .
       ${functionDetails.name}(
         ${functionDetails.params.join(",")}
       )`;
-	} else {
-		callExpression = `${exportName}(${functionDetails.params.join(",")})`;
-	}
+  } else {
+    callExpression = `${exportName}(${functionDetails.params.join(",")})`;
+  }
 
-	const functionCall = functionDetails.returns
-		? template.ast(`const result = ${callExpression};`)
-		: template.ast(`${callExpression};`);
+  const functionCall = functionDetails.returns
+    ? template.ast(`const result = ${callExpression};`)
+    : template.ast(`${callExpression};`);
 
-	const preTest = testBuilder.preTest({
-		callExpressions: functionDetails.callExpressions,
-		requireDeclarations,
-		imports
-	});
+  const preTest = testBuilder.preTest({
+    callExpressions: functionDetails.callExpressions,
+    requireDeclarations,
+    imports
+  });
 
-	const postTest = testBuilder.postTest({});
+  const postTest = testBuilder.postTest({});
 
-	blockStatement.push(...preTest);
-	blockStatement.push(...variables);
-	blockStatement.push(functionCall);
-	blockStatement.push(...postTest);
+  blockStatement.push(...preTest);
+  blockStatement.push(...variables);
+  blockStatement.push(functionCall);
+  blockStatement.push(...postTest);
 
-	const ast = testBuilder.createTestBlock({
-		description: functionDetails.name,
-		blockStatement
-	});
+  const ast = testBuilder.createTestBlock({
+    description: functionDetails.name,
+    blockStatement
+  });
 
-	return ast;
+  return ast;
 }
 
 function createTests(opts) {
-	const model = opts.model;
-	const testBuilder = opts.testBuilder;
-	const filenameSplit = model.getFilename().split(path.sep);
-	const description = filenameSplit[filenameSplit.length - 1];
-	let tests = null;
-	let blockStatement = [];
-	let constructorList = [];
+  const model = opts.model;
+  const testBuilder = opts.testBuilder;
+  const filenameSplit = model.getFilename().split(path.sep);
+  const description = filenameSplit[filenameSplit.length - 1];
+  let tests = null;
+  let blockStatement = [];
+  let constructorList = [];
 
-	// Class
-	if (model.getClasses().length > 0) {
-		tests = model.getClasses().reduce((acc, classDetails) => {
-			const className =
+  // Class
+  if (model.getClasses().length > 0) {
+    tests = model.getClasses().reduce((acc, classDetails) => {
+      const className =
         classDetails.name.charAt(0).toLowerCase() + classDetails.name.slice(1);
-			const constructorMethodFilter = classDetails.methods.filter(
-				method => method.kind === "constructor"
-			);
-			const methods = classDetails.methods.filter(
-				method => method.kind === "method"
-			);
+      const constructorMethodFilter = classDetails.methods.filter(
+        method => method.kind === "constructor"
+      );
+      const methods = classDetails.methods.filter(
+        method => method.kind === "method"
+      );
 
-			if (constructorMethodFilter.length > 0) {
-				constructorList = [
-					...constructorList,
-					{
-						name: classDetails.name,
-						initName: className,
-						params: constructorMethodFilter[0].params
-					}
-				];
-			}
+      if (constructorMethodFilter.length > 0) {
+        constructorList = [
+          ...constructorList,
+          {
+            name: classDetails.name,
+            initName: className,
+            params: constructorMethodFilter[0].params
+          }
+        ];
+      }
 
-			methods.forEach(method => {
-				const test = createMethodTest({
-					method,
-					className,
-					imports: model.getImportDeclarations(),
-					requireDeclarations: model.getRequireDeclarations(),
-					testBuilder
-				});
+      methods.forEach(method => {
+        const test = createMethodTest({
+          method,
+          className,
+          imports: model.getImportDeclarations(),
+          requireDeclarations: model.getRequireDeclarations(),
+          testBuilder
+        });
 
-				acc.push(test);
-			});
+        acc.push(test);
+      });
 
-			return acc;
-		}, []);
+      return acc;
+    }, []);
 
-		// Module
-	} else {
-		const constructorFunctionFilter = model
-			.getFunctions()
-			.filter(functionDetails => functionDetails.type === "constructor");
-		const functionList = model
-			.getFunctions()
-			.filter(functionDetails => functionDetails.type === "function");
+    // Module
+  } else {
+    const constructorFunctionFilter = model
+      .getFunctions()
+      .filter(functionDetails => functionDetails.type === "constructor");
+    const functionList = model
+      .getFunctions()
+      .filter(functionDetails => functionDetails.type === "function");
 
-		if (constructorFunctionFilter.length > 0) {
-			constructorList = [
-				...constructorList,
-				{
-					name: constructorFunctionFilter[0].name,
-					initName:
+    if (constructorFunctionFilter.length > 0) {
+      constructorList = [
+        ...constructorList,
+        {
+          name: constructorFunctionFilter[0].name,
+          initName:
             constructorFunctionFilter[0].name.charAt(0).toLowerCase() +
             constructorFunctionFilter[0].name.slice(1),
-					params: constructorFunctionFilter[0].params
-				}
-			];
-		}
+          params: constructorFunctionFilter[0].params
+        }
+      ];
+    }
 
-		tests = functionList.reduce((acc, functionDetails) => {
-			const moduleExportFilter = model
-				.getModuleExports()
-				.filter(moduleExport => {
-					let exists = moduleExport.value === functionDetails.name;
+    tests = functionList.reduce((acc, functionDetails) => {
+      const moduleExportFilter = model
+        .getModuleExports()
+        .filter(moduleExport => {
+          let exists = moduleExport.value === functionDetails.name;
 
-					if (!exists) {
-						exists = functionDetails.callee.some(
-							callee => callee === moduleExport.value
-						);
-					}
+          if (!exists) {
+            exists = functionDetails.callee.some(
+              callee => callee === moduleExport.value
+            );
+          }
 
-					return exists;
-				});
+          return exists;
+        });
 
-			const exportDeclarationFilter = model
-				.getExportDeclarations()
-				.filter(exportDeclaration => {
-					let exists = exportDeclaration.name === functionDetails.name;
+      const exportDeclarationFilter = model
+        .getExportDeclarations()
+        .filter(exportDeclaration => {
+          let exists = exportDeclaration.name === functionDetails.name;
 
-					if (!exists) {
-						exists = functionDetails.callee.some(
-							callee => callee === exportDeclaration.name
-						);
-					}
+          if (!exists) {
+            exists = functionDetails.callee.some(
+              callee => callee === exportDeclaration.name
+            );
+          }
 
-					return exists;
-				});
+          return exists;
+        });
 
-			const exportName =
+      const exportName =
         moduleExportFilter.length > 0
-        	? moduleExportFilter[0].value
-        	: exportDeclarationFilter[0].name;
+          ? moduleExportFilter[0].value
+          : exportDeclarationFilter[0].name;
 
-			const test = createFunctionTest({
-				functionDetails,
-				exportName,
-				imports: model.getImportDeclarations(),
-				requireDeclarations: model.getRequireDeclarations(),
-				testBuilder
-			});
+      const test = createFunctionTest({
+        functionDetails,
+        exportName,
+        imports: model.getImportDeclarations(),
+        requireDeclarations: model.getRequireDeclarations(),
+        testBuilder
+      });
 
-			acc.push(test);
+      acc.push(test);
 
-			return acc;
-		}, []);
-	}
+      return acc;
+    }, []);
+  }
 
-	if (constructorList.length > 0) {
-		const constructorVariables = constructorList.reduce(
-			(acc, constructorDetails) => {
-				acc.push(
-					t.variableDeclaration("let", [
-						t.variableDeclarator(
-							t.identifier(constructorDetails.initName),
-							null
-						)
-					])
-				);
+  if (constructorList.length > 0) {
+    const constructorVariables = constructorList.reduce(
+      (acc, constructorDetails) => {
+        acc.push(
+          t.variableDeclaration("let", [
+            t.variableDeclarator(
+              t.identifier(constructorDetails.initName),
+              null
+            )
+          ])
+        );
 
-				return acc;
-			},
-			[]
-		);
+        return acc;
+      },
+      []
+    );
 
-		const setup = testBuilder.setup({ constructorList });
+    const setup = testBuilder.setup({ constructorList });
 
-		blockStatement.push(...constructorVariables);
-		blockStatement.push(...setup);
-	}
+    blockStatement.push(...constructorVariables);
+    blockStatement.push(...setup);
+  }
 
-	const teardown = testBuilder.teardown({
-		libraries: model.getLibraries(),
-		imports: model.getImportDeclarations()
-	});
+  const teardown = testBuilder.teardown({
+    libraries: model.getLibraries(),
+    imports: model.getImportDeclarations()
+  });
 
-	blockStatement.push(...teardown);
-	blockStatement.push(...tests);
+  blockStatement.push(...teardown);
+  blockStatement.push(...tests);
 
-	const ast = t.expressionStatement(
-		t.callExpression(t.identifier("describe"), [
-			t.stringLiteral(description),
-			t.arrowFunctionExpression([], t.blockStatement(blockStatement))
-		])
-	);
+  const ast = t.expressionStatement(
+    t.callExpression(t.identifier("describe"), [
+      t.stringLiteral(description),
+      t.arrowFunctionExpression([], t.blockStatement(blockStatement))
+    ])
+  );
 
-	return ast;
+  return ast;
 }
 
 function createRequireDeclarations(opts) {
-	const requireDeclarations = opts.requireDeclarations;
-	const requireDeclarationsAst = requireDeclarations.reduce(
-		(acc, requiredModule) => {
-			if (requiredModule.scope) {
-				acc.push(
-					template.ast(
-						`const ${requiredModule.name} = require("${requiredModule.path}").${
-							requiredModule.scope
-						};`
-					)
-				);
-			} else {
-				acc.push(
-					template.ast(
-						`const ${requiredModule.name} = require("${requiredModule.path}");`
-					)
-				);
-			}
+  const requireDeclarations = opts.requireDeclarations;
+  const requireDeclarationsAst = requireDeclarations.reduce(
+    (acc, requiredModule) => {
+      if (requiredModule.scope) {
+        acc.push(
+          template.ast(
+            `const ${requiredModule.name} = require("${requiredModule.path}").${
+              requiredModule.scope
+            };`
+          )
+        );
+      } else {
+        acc.push(
+          template.ast(
+            `const ${requiredModule.name} = require("${requiredModule.path}");`
+          )
+        );
+      }
 
-			return acc;
-		},
-		[]
-	);
+      return acc;
+    },
+    []
+  );
 
-	return requireDeclarationsAst;
+  return requireDeclarationsAst;
 }
 
 module.exports = {
-	generate
+  generate
 };

@@ -9,15 +9,5 @@ plugins:
 parserOptions:
   sourceType: module
 rules:
-  indent:
+  'prettier/prettier':
     - error
-    - tab
-  linebreak-style:
-    - error
-    - unix
-  quotes:
-    - error
-    - double
-  semi:
-    - error
-    - always
