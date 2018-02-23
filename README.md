@@ -1,5 +1,7 @@
 # Platelunch
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/schempy/platelunch.svg)](https://greenkeeper.io/)
+
 <p align="center">
   <a href="https://travis-ci.org/schempy/platelunch">
     <img alt="Travis" src="https://img.shields.io/travis/schempy/platelunch/master.svg?style=flat-square">
