@@ -150,7 +150,7 @@ describe("cli", () => {
     process.argv = [
       "some-directory",
       "some-directory",
-      "",
+      1234,
       "--test-framework",
       "jest"
     ];
@@ -158,7 +158,7 @@ describe("cli", () => {
     require("../../bin/platelunch");
 
     const expected =
-      "Unable to expand glob patterns:  !**/node_modules/** !./node_modules/**";
+      "Unable to expand glob patterns: 1234 !**/node_modules/** !./node_modules/**";
 
     expect(errorMsg).toBe(expected);
   });

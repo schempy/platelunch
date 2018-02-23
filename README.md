@@ -1,7 +1,5 @@
 # Platelunch
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/schempy/platelunch.svg)](https://greenkeeper.io/)
-
 <p align="center">
   <a href="https://travis-ci.org/schempy/platelunch">
     <img alt="Travis" src="https://img.shields.io/travis/schempy/platelunch/master.svg?style=flat-square">
@@ -17,7 +15,10 @@
   </a>
   <a href="#badge">
     <img alt="semantic-release" src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg">
-  </a>  
+  </a>
+  <a>
+    <img alt="greenkeeper" src="https://badges.greenkeeper.io/schempy/platelunch.svg">
+  </a>
 </p>
 
 <p align="center">
