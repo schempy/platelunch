@@ -56,7 +56,7 @@
     "jest": "22.4.2",
     "prettier": "1.12.1",
     "semantic-release": "15.5.0",
-    "travis-deploy-once": "5.0.0"
+    "travis-deploy-once": "5.0.11"
   },
   "scripts": {
     "commit": "git-cz",
