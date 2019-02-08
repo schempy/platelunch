@@ -332,13 +332,14 @@ function getFunctionDetails(ast) {
   let returns = false;
   let callExpressions = [];
 
-  const n =
-    ast.node.type === "VariableDeclaration"
-      ? ast.node.declarations[0].init
-      : ast.node;
   const type = "function";
-  const params = n.params.reduce((acc, value) => {
-    const param = t.isAssignmentPattern(value) ? value.left.name : value.name;
+  let backupParamNameIndex = 0;
+  const params = ast.node.params.reduce((acc, value) => {
+    const param = t.isAssignmentPattern(value)
+      ? value.left.name
+      : t.isObjectPattern(value)
+        ? `param${++backupParamNameIndex}`
+        : value.name;
 
     acc.push(param);
 
