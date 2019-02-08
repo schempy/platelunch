@@ -33,7 +33,8 @@
       "lcov",
       "text",
       "html"
-    ]
+    ],
+    "testURL":"http://localhost/"
   },
   "dependencies": {
     "@babel/template": "7.0.0-beta.52",
