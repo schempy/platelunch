@@ -513,13 +513,15 @@ function getExportDeclarations(declaration) {
       }
     },
     ArrowFunctionExpression: path => {
-      exportDeclarations = [
-        ...exportDeclarations,
-        {
-          type: declaration.type,
-          name: path.parent.id.name
-        }
-      ];
+      if (path.parent.type === "VariableDeclarator") {
+        exportDeclarations = [
+          ...exportDeclarations,
+          {
+            type: declaration.type,
+            name: path.parent.id.name
+          }
+        ];
+      }
     },
 
     ClassDeclaration: path => {
