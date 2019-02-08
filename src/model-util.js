@@ -339,7 +339,9 @@ function getFunctionDetails(ast) {
       ? value.left.name
       : t.isObjectPattern(value)
         ? `param${++backupParamNameIndex}`
-        : value.name;
+        : t.isRestElement(value)
+          ? value.argument.name
+          : value.name;
 
     acc.push(param);
 
