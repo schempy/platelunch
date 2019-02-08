@@ -36,41 +36,7 @@ describe("Function Declaration", () => {
 
     expect(output).toBe(expected);
   });
-  test("should export nameless function defined as const ", () => {
-    const code = `
-      const add = (num1, num2)=> {
-        return num1 + num2;
-      }
 
-      function subtrack() {
-        return true;
-      }
-
-      module.exports = add;
-    `;
-
-    const output = generateCode({
-      code: code,
-      testFramework: "jest",
-      filename: "my-module.js",
-      removeWhitespace: true
-    });
-
-    const expected = `
-      const add = require("my-module");
-
-      describe("my-module.js", () => {
-        test("add", () => {
-          const num1 = null;
-          const num2 = null;
-          const result = add(num1, num2);
-        });
-      });`
-      .replace(/ /g, "")
-      .trim();
-
-    expect(output).toBe(expected);
-  });
   test("should export function that does not return", () => {
     const code = `
       function something() { }
