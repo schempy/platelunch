@@ -71,6 +71,68 @@ describe("Function Declaration", () => {
 
     expect(output).toBe(expected);
   });
+  test("should consider direct export functions", () => {
+    const code = `
+      const add = (num1, num2)=> {
+        return num1 + num2;
+      }
+
+      function subtrack() {
+        return true;
+      }
+
+      export default add;
+    `;
+
+    const output = generateCode({
+      code: code,
+      testFramework: "jest",
+      filename: "my-module.js",
+      removeWhitespace: true
+    });
+
+    const expected = `
+      import add from "my-module";
+      describe("my-module.js", () => {
+        test("add", () => {
+          const num1 = null;
+          const num2 = null;
+          const result = add(num1, num2);
+        });
+      });`
+      .replace(/ /g, "")
+      .trim();
+
+    expect(output).toBe(expected);
+  });
+  test("should consider export const functions", () => {
+    const code = `
+      export const add = (num1, num2)=> {
+        return num1 + num2;
+      }
+    `;
+
+    const output = generateCode({
+      code: code,
+      testFramework: "jest",
+      filename: "my-module.js",
+      removeWhitespace: true
+    });
+
+    const expected = `
+      import {add} from "my-module";
+      describe("my-module.js", () => {
+        test("add", () => {
+          const num1 = null;
+          const num2 = null;
+          const result = add(num1, num2);
+        });
+      });`
+      .replace(/ /g, "")
+      .trim();
+
+    expect(output).toBe(expected);
+  });
   test("should export function that does not return", () => {
     const code = `
       function something() { }

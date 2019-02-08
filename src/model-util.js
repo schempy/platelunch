@@ -489,6 +489,16 @@ function getConstructorFromFunction(opts) {
 
 function getExportDeclarations(declaration) {
   let exportDeclarations = [];
+  if (declaration.type === "default") {
+    exportDeclarations = [
+      ...exportDeclarations,
+      {
+        type: declaration.type,
+        name: declaration.ast.node.declaration.name
+      }
+    ];
+    return exportDeclarations;
+  }
 
   declaration.ast.traverse({
     ExportSpecifier: path => {
@@ -497,6 +507,15 @@ function getExportDeclarations(declaration) {
         {
           type: declaration.type,
           name: path.node.exported.name
+        }
+      ];
+    },
+    ArrowFunctionExpression: path => {
+      exportDeclarations = [
+        ...exportDeclarations,
+        {
+          type: declaration.type,
+          name: path.parent.id.name
         }
       ];
     },
