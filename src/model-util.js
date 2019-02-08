@@ -15,7 +15,6 @@ function generate(ast, filename) {
   let exportDeclarations = [];
 
   testModel.addFilename(filename);
-  // console.log(ast.program.body[0].declarations);
 
   traverse(ast, {
     ImportDeclaration(path) {
@@ -332,10 +331,11 @@ function getFunctionDetails(ast) {
   let variables = [];
   let returns = false;
   let callExpressions = [];
-  let n = ast.node;
-  if (n.type === "VariableDeclaration") {
-    n = n.declarations[0].init;
-  }
+
+  const n =
+    ast.node.type === "VariableDeclaration"
+      ? ast.node.declarations[0].init
+      : ast.node;
   const type = "function";
   const params = n.params.reduce((acc, value) => {
     const param = t.isAssignmentPattern(value) ? value.left.name : value.name;
@@ -413,12 +413,9 @@ function getFunctionExpression(opts) {
 function getFunctionDeclaration(ast) {
   const callee = [];
   const n = ast.node;
-  let name = "";
-  if (n.type === "VariableDeclaration") {
-    name = n.declarations[0].id.name;
-  } else {
-    name = ast.node.id.name;
-  }
+  const name =
+    n.type === "VariableDeclaration" ? n.declarations[0].id.name : n.id.name;
+
   const functionDetails = getFunctionDetails(ast);
 
   return Object.assign(functionDetails, { callee, name });
