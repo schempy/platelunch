@@ -29,16 +29,7 @@ function generate(ast, filename) {
     FunctionDeclaration(path) {
       functions = [...functions, path];
     },
-    // VariableDeclaration(path) {
-    //   const {
-    //     node: { declarations = [] }
-    //   } = path;
-    //   declarations.forEach(d => {
-    //     if (d.init.type === "ArrowFunctionExpression") {
-    //       functions = [...functions, path];
-    //     }
-    //   });
-    // },
+
     ArrowFunctionExpression(path) {
       functionExpressions = [
         ...functionExpressions,
