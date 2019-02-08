@@ -489,16 +489,6 @@ function getConstructorFromFunction(opts) {
 
 function getExportDeclarations(declaration) {
   let exportDeclarations = [];
-  if (declaration.type === "default") {
-    exportDeclarations = [
-      ...exportDeclarations,
-      {
-        type: declaration.type,
-        name: declaration.ast.node.declaration.name
-      }
-    ];
-    return exportDeclarations;
-  }
 
   declaration.ast.traverse({
     ExportSpecifier: path => {
@@ -509,6 +499,18 @@ function getExportDeclarations(declaration) {
           name: path.node.exported.name
         }
       ];
+    },
+    Identifier: path => {
+      // This is only for export default add case, the only available node here is the identifier
+      if (path.parent.type === "ExportDefaultDeclaration") {
+        exportDeclarations = [
+          ...exportDeclarations,
+          {
+            type: declaration.type,
+            name: path.node.name
+          }
+        ];
+      }
     },
     ArrowFunctionExpression: path => {
       exportDeclarations = [
