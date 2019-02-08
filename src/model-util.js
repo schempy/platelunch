@@ -15,6 +15,7 @@ function generate(ast, filename) {
   let exportDeclarations = [];
 
   testModel.addFilename(filename);
+  // console.log(ast.program.body[0].declarations);
 
   traverse(ast, {
     ImportDeclaration(path) {
@@ -27,6 +28,25 @@ function generate(ast, filename) {
 
     FunctionDeclaration(path) {
       functions = [...functions, path];
+    },
+    // VariableDeclaration(path) {
+    //   const {
+    //     node: { declarations = [] }
+    //   } = path;
+    //   declarations.forEach(d => {
+    //     if (d.init.type === "ArrowFunctionExpression") {
+    //       functions = [...functions, path];
+    //     }
+    //   });
+    // },
+    ArrowFunctionExpression(path) {
+      functionExpressions = [
+        ...functionExpressions,
+        {
+          parentPath: path.parentPath,
+          path: path
+        }
+      ];
     },
 
     FunctionExpression(path) {
@@ -321,9 +341,12 @@ function getFunctionDetails(ast) {
   let variables = [];
   let returns = false;
   let callExpressions = [];
-
+  let n = ast.node;
+  if (n.type === "VariableDeclaration") {
+    n = n.declarations[0].init;
+  }
   const type = "function";
-  const params = ast.node.params.reduce((acc, value) => {
+  const params = n.params.reduce((acc, value) => {
     const param = t.isAssignmentPattern(value) ? value.left.name : value.name;
 
     acc.push(param);
@@ -398,7 +421,13 @@ function getFunctionExpression(opts) {
 
 function getFunctionDeclaration(ast) {
   const callee = [];
-  const name = ast.node.id.name;
+  const n = ast.node;
+  let name = "";
+  if (n.type === "VariableDeclaration") {
+    name = n.declarations[0].id.name;
+  } else {
+    name = ast.node.id.name;
+  }
   const functionDetails = getFunctionDetails(ast);
 
   return Object.assign(functionDetails, { callee, name });
