@@ -29,6 +29,16 @@ function generate(ast, filename) {
       functions = [...functions, path];
     },
 
+    ArrowFunctionExpression(path) {
+      functionExpressions = [
+        ...functionExpressions,
+        {
+          parentPath: path.parentPath,
+          path: path
+        }
+      ];
+    },
+
     FunctionExpression(path) {
       functionExpressions = [
         ...functionExpressions,
@@ -323,8 +333,15 @@ function getFunctionDetails(ast) {
   let callExpressions = [];
 
   const type = "function";
+  let backupParamNameIndex = 0;
   const params = ast.node.params.reduce((acc, value) => {
-    const param = t.isAssignmentPattern(value) ? value.left.name : value.name;
+    const param = t.isAssignmentPattern(value)
+      ? value.left.name
+      : t.isObjectPattern(value)
+        ? `param${++backupParamNameIndex}`
+        : t.isRestElement(value)
+          ? value.argument.name
+          : value.name;
 
     acc.push(param);
 
@@ -398,7 +415,10 @@ function getFunctionExpression(opts) {
 
 function getFunctionDeclaration(ast) {
   const callee = [];
-  const name = ast.node.id.name;
+  const n = ast.node;
+  const name =
+    n.type === "VariableDeclaration" ? n.declarations[0].id.name : n.id.name;
+
   const functionDetails = getFunctionDetails(ast);
 
   return Object.assign(functionDetails, { callee, name });
@@ -482,6 +502,29 @@ function getExportDeclarations(declaration) {
           name: path.node.exported.name
         }
       ];
+    },
+    Identifier: path => {
+      // This is only for export default add case, the only available node here is the identifier
+      if (path.parent.type === "ExportDefaultDeclaration") {
+        exportDeclarations = [
+          ...exportDeclarations,
+          {
+            type: declaration.type,
+            name: path.node.name
+          }
+        ];
+      }
+    },
+    ArrowFunctionExpression: path => {
+      if (path.parent.type === "VariableDeclarator") {
+        exportDeclarations = [
+          ...exportDeclarations,
+          {
+            type: declaration.type,
+            name: path.parent.id.name
+          }
+        ];
+      }
     },
 
     ClassDeclaration: path => {

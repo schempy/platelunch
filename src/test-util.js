@@ -62,8 +62,13 @@ function createMainFileInclude(opts) {
 
       return acc;
     }, []);
+    // the path.relative calculate relative path from the directory to another, so first, convert the file path to directory path
+    const testFolder = path.resolve("__tests__/" + filename, "../");
+    const relativePathForImport = path.relative(testFolder, filename);
 
-    sourceFiles = [t.importDeclaration(specifiers, t.stringLiteral(filename))];
+    sourceFiles = [
+      t.importDeclaration(specifiers, t.stringLiteral(relativePathForImport))
+    ];
   } else {
     sourceFiles = moduleExports.reduce((acc, moduleExport) => {
       if (moduleExport.type === "identifier") {
