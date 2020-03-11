@@ -43,7 +43,7 @@
     "babylon": "6.18.0",
     "globby": "8.0.1",
     "lodash.difference": "4.5.0",
-    "minimist": "1.2.0",
+    "minimist": "1.2.4",
     "mkdirp": "0.5.1"
   },
   "devDependencies": {
